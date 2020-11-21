@@ -22,18 +22,91 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight)
 }
 
+function inList(element, array) {
+  for (var part of array) {
+    if (element == part) {
+      return true
+    }
+  }
+  return false
+}
+
+function beginningChars(string, chr) {
+  var counter = 0
+  for (var part of string) {
+    if (part == chr) {
+      counter += 1
+    } else {
+      return counter
+    }
+  }
+}
+
+function mySplit(string, chars=["+", "-"], remove=" ") {
+  var sub = "";
+  var list = []
+  var stringLength = string.length
+  
+  for (var i = 0; i < stringLength; i++) {
+    chr = string[i]
+    if (inList(chr, chars) || i == stringLength - 1) {
+      if (i == stringLength - 1) {
+        if (!inList(chr, chars)) {
+          sub += chr
+        }
+      }
+      sub = sub.split(remove).join("")
+      if (i != beginningChars(string, " ")) {
+        list.push(sub)
+      }
+      sub = ""
+      if (chr == "-") {
+        sub = "-"
+      }
+    } else {
+      sub += chr
+    }
+  }
+  return list
+}
+
 function variables(equation) {
   var text = equation.value()
-  return [1, -2, -4, "x"]
+  var a = mySplit(text)[0] + " "
+  a = a.slice(0, -2)
+  if (a.length == 2 || a[0] == "-") {
+    a = "1" + a[0] + " "
+  }
+  var b = mySplit(text)[1] + " "
+  b = b.slice(0, -2)
+  if (b == "") {
+    b = "1"
+  }
+  var c = mySplit(text)[2]
+  var v = a[a.length - 2]
+  a = a.slice(0, -2)
+  //print(a, b, c, v)
+  return [a, b, c, v]
+}
+
+function factors(num) {
+  facts = []
+  for (var i = 1; i <= ceil(sqrt(num)); i++) {
+    if (num % i == 0) {
+      facts.push(i)
+      facts.push(num / i)
+    }
+  }
+  return [...new Set(facts)]
 }
 
 function copyText(text) {
-  text.select();
-  text.setSelectionRange(0, 99999); /*For mobile devices*/
+  text.select()
+  text.setSelectionRange(0, 99999) /*For mobile devices*/
 
-  document.execCommand("copy");
+  document.execCommand("copy")
 
-  alert("Copied Solution!");
+  setTimeout(function() {alert("Copied Solution!")}, 150)
 }
 
 function copySolution() {
@@ -50,24 +123,40 @@ function factored(vars) {
   var v = vars[3]
   var answer1 = (-b + sqrt(b ** 2 - (4 * a * c))) / (2 * a)
   var answer2 = (-b - sqrt(b ** 2 - (4 * a * c))) / (2 * a)
+  var facts = factors(a)
   var string = ""
+  var varA, varB, varC, varD, first, second;
+  
+  for (var factor of facts) {
+    varA = factor
+    varB = -answer1 * varA
+    varC = a / factor
+    varD = -answer2 * varC
+    
+    if (varB * varD == c && (varA * varD + varB * varC) == b) {
+      break
+    }
+  }
   
   if (answer1 < 0) {
-    string += "(" + v + " + " + str(-answer1) + ")"
+    string += "(" + str(varA) + v + " + " + str(varB) + ")"
   } else if (answer1 > 0) {
-    string += "(" + v + " - " + str(answer1) + ")"
-  } else {
-    string += v
+    string += "(" + str(varA) + v + " - " + str(-varB) + ")"
+  } else if (varA != undefined) {
+    string += str(varA) + v
+    first = true
   }
+    
   if (answer2 < 0) {
-    string += "(" + v + " + " + str(-answer2) + ")"
+    string += "(" + str(varC) + v + " + " + str(varD) + ")"
   } else if (answer2 > 0) {
-    string += "(" + v + " - " + str(answer2) + ")"
-  } else {
-    string += "x"
+    string += "(" + str(varC) + v + " - " + str(-varD) + ")"
+  } else if (varA != undefined) {
+    string += str(varC) + v
+    second = true
   }
   
-  if (string == "xx") {
+  if (string == "xx" || string == "" || (first && second) || varA == undefined || varC == undefined) {
     string = "No Solution"
   }
   return string
