@@ -137,6 +137,18 @@ function factored(vars) {
       break
     }
   }
+    
+  if (varA == 1) {
+    varA = ""
+  } else if (varA == -1) {
+    varA = "-"
+  }
+    
+  if (varC == 1) {
+    varC = ""
+  } else if (varC == -1) {
+    varC = "-"
+  }
   
   if (answer1 < 0) {
     string += "(" + str(varA) + v + " + " + str(varB) + ")"
