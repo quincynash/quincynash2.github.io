@@ -20,6 +20,8 @@ function setup() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight)
+  button.position(width/2 - button.width/2, height/2 + 100)
+  equation.position(width/2 - equation.width/2, height/2 - equation.height/2)
 }
 
 function inList(element, array) {
