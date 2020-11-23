@@ -33,6 +33,10 @@ function inList(element, array) {
   return false
 }
 
+function isInt(num) {
+  return Number.isInteger(num)
+}
+
 function beginningChars(string, chr) {
   var counter = 0
   for (var part of string) {
@@ -91,7 +95,7 @@ function variables(equation) {
   return [a, b, c, v]
 }
 
-function factors(num) {
+function factors(num, sort=false) {
   facts = []
   for (var i = 1; i <= ceil(sqrt(num)); i++) {
     if (num % i == 0) {
@@ -99,7 +103,10 @@ function factors(num) {
       facts.push(num / i)
     }
   }
-  return [...new Set(facts)]
+  if (sort) {
+    facts.sort()
+  }
+  return facts
 }
 
 function copyText(text) {
@@ -140,6 +147,58 @@ function factored(vars) {
     }
   }
     
+  var num, nums;
+    
+  if (!isInt(varB) && isInt(varB * varD)) {
+    nums = factors(varD)
+    for (num of nums) {
+      if (isInt(varB * num) && isInt(varA * num) && isInt(varC / num)) {
+        varA *= num
+        varB *= num
+        varC /= num
+        varD /= num
+        break
+      }
+    }
+  }
+  if (!isInt(varA) && isInt(varA * varC)) {
+    nums = factors(varC)
+    for (num of nums) {
+      if (isInt(varA * num) && isInt(varB * num) && isInt(varD / num)) {
+        varA *= num
+        varB *= num
+        varC /= num
+        varD /= num
+        break
+      }
+    }
+  }
+    
+  if (!isInt(varD) && isInt(varB * varD)) {
+    nums = factors(varB)
+    for (num of nums) {
+      if (isInt(varD * num) && isInt(varA / num) && isInt(varC * num)) {
+        varA /= num
+        varB /= num
+        varC *= num
+        varD *= num
+        break
+      }
+    }
+  }
+  if (!isInt(varC) && isInt(varA * varC)) {
+    nums = factors(varA)
+    for (num of nums) {
+      if (isInt(varC * num) && isInt(varB / num) && isInt(varD * num)) {
+        varA /= num
+        varB /= num
+        varC *= num
+        varD *= num
+        break
+      }
+    }
+  }
+    
   if (varA == 1) {
     varA = ""
   } else if (varA == -1) {
@@ -166,7 +225,7 @@ function factored(vars) {
   } else if (answer2 > 0) {
     string += "(" + str(varC) + v + " - " + str(-varD) + ")"
   } else if (varA != undefined) {
-    string += str(varC) + v
+    string = str(varC) + v + string
     second = true
   }
   
